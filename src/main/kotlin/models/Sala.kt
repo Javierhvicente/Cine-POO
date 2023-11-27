@@ -32,6 +32,13 @@ class Sala(
         return true
     }
 
+    fun isOcupada(fila: Int, columna: Int):Boolean{
+        return butacas[fila][columna].ocupada
+    }
+
+    fun actualizarButaca(filas: Int, columnas: Int, isOcupada: Boolean){
+        butacas[filas][columnas].ocupada = isOcupada
+    }
     fun isLlena(): Boolean{
         val total = filas * columnas
         var ocupadas = 0

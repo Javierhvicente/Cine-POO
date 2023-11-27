@@ -16,10 +16,10 @@ fun main(args: Array<String>) {
         println("5 Salir")
         opcion = readln().toIntOrNull() ?: -1
         when(opcion){
-            1 -> verSala()
+            1 -> verSala(sala)
             2 -> comprarEntrada(sala)
-            3 -> devolverEntrada()
-            4 -> verRecaudacion()
+            3 -> devolverEntrada(sala)
+            4 -> verRecaudacion(sala)
             5 -> despedirse()
             else -> println("Opción no válida")
         }
@@ -30,12 +30,20 @@ fun despedirse() {
     println("Hasta luego, vuelva pronto")
 }
 
-fun verRecaudacion() {
+fun verRecaudacion(sala: Sala) {
     TODO("Not yet implemented")
 }
 
-fun devolverEntrada() {
-    TODO("Not yet implemented")
+fun devolverEntrada(sala: Sala) {
+    if(sala.isVacia()){
+        println("La sala está vacía, no se puede devolver ninguna entrada")
+        return
+    }
+    val asiento = getAsiento(sala, true)
+    sala.actualizarButaca(asiento[0], asiento[1], false)
+    val fila: Char = (asiento[0] + 65).toChar()
+    println("Butaca devuelta: $fila:${asiento[1]+1} ha sido devuelta")
+
 }
 
 fun comprarEntrada(sala: Sala) {
@@ -62,26 +70,46 @@ fun inputAsiento():String {
 }
 
 fun validatePosicion(sala: Sala, fila: String, columna: Int): Boolean {
-    TODO("Not yet implemented")
+    if((columna-1) !in 0..sala.columnas){
+        println("La columna no es válida, debe ser entre 1 y ${sala.columnas}")
+        return false
+    }
+    if(fila[0].code !in 65..(65 + sala.filas)){
+        println("LA filas no es válida, debe ser una letra entre A y ${sala.filas + 64}")
+        return false
+    }
+    return true
 }
 
 fun getAsiento(sala: Sala, isOcupada: Boolean = false): IntArray {
     var correcto = true
     var fila = ""
-    var columna = ""
+    var columna = 0
     var filaInt = 0
     var columnaInt = 0
     do{
         val asiento = inputAsiento()
         fila = asiento.split(":")[0].uppercase()
-        columna = asiento.split(":")[1].toIntOrNull()
+        columna = asiento.split(":")[1].toIntOrNull() ?: 0
         correcto = validatePosicion(sala, fila, columna)
+        filaInt = fila[0].code - 65
+        columnaInt = columna - 1
+        correcto = isAsientoOcupado(sala, filaInt, columnaInt, isOcupada)
     }while (!correcto)
+    return intArrayOf(filaInt, columnaInt)
+}
+
+fun isAsientoOcupado(sala: Sala, filaInt: Int, columnaInt: Int, ocupada: Boolean): Boolean {
+    if(sala.isOcupada(filaInt, columnaInt) == !ocupada){
+        println("La butaca no está disponible o ya ha sido reservada por otro cliente, por favor elige otra butaca")
+        return false
+    }
+    return true
 }
 
 
-fun verSala() {
-    TODO("Not yet implemented")
+fun verSala(sala: Sala) {
+    println(sala)
 }
 
 private fun imprimirSala(sala: Sala) {
